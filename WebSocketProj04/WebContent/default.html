@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<style>
+		textarea {
+		border-color: black;
+		border-style: solid;
+		border-width: thin;
+		padding: 3px;
+		}
+		
+		body{
+			background-color: grey;
+			}
+	</style>
+	
+	
+
+		<meta http-equiv="Content-Type" content = "text/html; charset=ISO-8859-1">
+		<title>WebSocket Tutorial 04</title>
+		<script type = "text/javascript">
+		
+			//Create a new webSocket Connection
+			var websocket = new WebSocket ("ws://localhost:8080/WebSocketProj04/ChatroomServerEndpoint");
+			
+			
+			//Parses the json data sent from the ChatServerEndpoint and adds that onto the messagesTextArea <textarea> tag below
+			websocket.onmessage = function processMessage(message){
+				var jsonData = JSON.parse(message.data);
+				if (jsonData.message != null) messagesTextArea.value += jsonData.message + "\n";
+				if (jsonData.users != null)
+				{
+					usersTextArea.value = "";
+					var i = 0;
+					while(i<jsonData.users.length) usersTextArea.value += jsonData.users[i++] +"\n";
+				}
+			}
+			//Used when the Send button is clicked to send the messge info to the websocket
+			function sendMessage(){
+				websocket.send(messageText.value);
+				messageText.value = "";
+			}
+			//closes the websocket when needed
+			window.onbeforeunload = function(){
+				websocket.onclose = function(){};
+				websocket.close();
+			};
+			
+			//creates radio buttons that can be selected to change the text color
+			function create_radio_button(){
+						
+						var inputRadio = "<input name='rad' type='radio' value='red' onclick = 'text_color()'>red<br>"
+					    inputRadio += "<input name='rad' type='radio' value ='blue' onclick ='text_color()'>blue<br>"
+					    inputRadio += "<input name='rad' type='radio' value ='green' onclick = 'text_color()'>green<br>"
+					    inputRadio += "<input name= 'rad' type='radio' value ='black' onclick = 'text_color()'>black<br>"
+					    document.getElementById("mainDiv").innerHTML=inputRadio 
+			}
+			//creates radio buttons that can be selected to change the font size
+			function change_font_buttons()
+			{
+						var fontRadio ="<input name ='font' type='radio' value='smaller' onclick = 'change_font()'>Smaller<br>"
+						fontRadio += "<input name='font' type='radio' value='medium' onclick = 'change_font()'>Medium<br>"
+						fontRadio += "<input name='font' type='radio' value='large' onclick = 'change_font()'>Large<br>"
+						fontRadio += "<input name='font' type='radio' value='larger' onclick = 'change_font()'>Larger<br>"
+						document.getElementById("mainDiv").innerHTML=fontRadio
+							
+			}
+			
+			//Function to change the size of the text in both text areas
+			//creates an array of the "mainDiv" childNodes created in the previous function
+			//iterates through the values and choses the radio button that is currently selected
+			//Then changes the fontSize of the two text areas accordingly depending on which value is selected
+			
+			function change_font()
+			{
+				var a = document.getElementById("messagesTextArea");
+				var b = document.getElementById("usersTextArea");
+				var arr = document.getElementById("mainDiv").childNodes;
+				var font;
+				
+				for(var i=0;i<arr.length;i++)
+					{
+						if(arr[i].checked)
+							{
+								font = arr[i].value;
+							}
+							
+					}
+				
+				if(font == "larger")
+					{
+						a.style.fontSize = "larger";
+						b.style.fontSize = "larger";
+					}
+				else if(font == "smaller")
+					{
+						a.style.fontSize = "smaller";
+						b.style.fontSize = "smaller";
+					}
+				else if(font == "large")
+					{
+						a.style.fontSize = "large";
+						b.style.font = "large";
+					}
+			
+				else
+					{
+						a.style.fontSize ="medium";
+						b.style.fontSize ="medium";
+					}
+				
+			}
+			//Similar to the change_font function only accesses the mainDiv when it containts the color radio buttons then changes
+			//the color of the text contatined in the usersTextArea and the messagesTextArea
+			function text_color(){
+				
+				var a = document.getElementById("messagesTextArea");
+				var b = document.getElementById("usersTextArea");
+				var arr = document.getElementById("mainDiv").childNodes;
+				var color;
+				
+				for(var i=0;i<arr.length;i++)
+					{
+						if(arr[i].checked)
+							{
+								color = arr[i].value;
+							}
+							
+					
+					
+					}
+				
+				if(color == "red")
+					{
+						a.style.color = "red";
+						b.style.color ="red";
+					}
+				else if(color == "blue")
+					{
+						a.style.color = "blue";
+						b.style.color = "blue";
+					}
+				else if(color =="green")
+					{
+						a.style.color = "green";
+						b.style.color = "green";
+					}
+				else if(color =="black")
+					{
+						a.style.color = "black";
+						b.style.color ="black";
+					}
+				else
+					{
+						a.style.color ="black";
+						b.style.color ="black";
+					}
+			}
+			
+		
+		</script>
+	</head>
+	<body>
+	
+		<h1>Users</h1>
+		<textarea id ="usersTextArea" rows="10" cols="10" style ="color:black;fontSize:medium" readonly="readonly"></textarea><br>  <br/>
+		<h1>Text Area</h1>
+		<textarea id = "messagesTextArea" readonly = "readonly" rows = "10" cols="45" style ="color:black;fontSize:medium"  ></textarea><br>  <br/>
+		<input type="text" id="messageText" size="50" /><input type = "button" value ="Send" onclick = "sendMessage();"  /><select id ="Options" name="Options"><option value ="option">Options</option><option value ="color" onclick ="create_radio_button()">Text_Color</option><option value ="fonts" onclick ="change_font_buttons()" >Font Size</option></select><div id = "mainDiv"></div>
+		
+		
+		
+	</body>
+</html>
